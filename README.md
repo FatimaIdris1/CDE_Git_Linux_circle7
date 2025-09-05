@@ -1,2 +1,1 @@
-# CDE_Git_Linux
-This repository contains the Git and linux scripts and ETL diagram
+# CDE_Git_Linux Assignment for Circle 7
