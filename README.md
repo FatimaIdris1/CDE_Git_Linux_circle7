@@ -32,15 +32,3 @@
 ***Total number of accounts that have a sales rep from the Northeast region***
 
 <img width="227" height="95" alt="image" src="https://github.com/user-attachments/assets/d7a3af4f-2b99-4cb9-a9a8-7e892ef6c5ae" />
-
-
-
-
-
-
-
-
-
-
-
-
