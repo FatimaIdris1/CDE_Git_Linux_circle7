@@ -1,0 +1,75 @@
+/* 1. Which 5 accounts have the most number of orders?*/
+
+SELECT 
+a.id AS account_id,a.name, COUNT(o.id) AS order_count,
+    RANK() OVER (ORDER BY COUNT(o.id) DESC
+    ) AS repeat_order_rank
+FROM accounts a
+JOIN orders o ON a.id = o.account_id
+JOIN sales_reps s ON a.sales_rep_id = s.id
+GROUP BY a.id
+LIMIT 5;
+
+
+/* 2. Top 3 sales reps for each region ranked by revenue.*/
+WITH ranked_reps AS (
+    SELECT 
+        r.name AS region, s.name AS sales_rep,
+        SUM(o.total_amt_usd) AS total_revenue,
+        RANK() OVER (
+            PARTITION BY r.name 
+            ORDER BY SUM(o.total_amt_usd) DESC
+        ) AS sales_rep_rank
+    FROM sales_reps s
+    JOIN accounts a 
+        ON s.id = a.sales_rep_id
+    JOIN orders o 
+        ON a.id = o.account_id
+    JOIN region r 
+        ON s.region_id = r.id
+    GROUP BY s.name, r.name
+)
+SELECT region,sales_rep, total_revenue
+FROM ranked_reps
+WHERE sales_rep_rank <= 3
+ORDER BY region, sales_rep_rank;
+
+/* 3. How is monthly revenue trending across years? */
+
+SELECT
+    EXTRACT(YEAR FROM occurred_at) AS year,
+    EXTRACT(MONTH FROM occurred_at) AS month,
+    SUM(total_amt_usd) AS total_revenue
+FROM orders
+GROUP BY EXTRACT(YEAR FROM occurred_at), EXTRACT(MONTH FROM occurred_at)
+ORDER BY year ASC;
+
+/* 4. Do accounts with more web events tend to place more or larger orders?*/
+SELECT 
+    a.id AS account_id,
+    COALESCE(w.total_web_events, 0) AS total_web_events,
+    COALESCE(o.total_orders, 0) AS total_orders,
+    COALESCE(o.total_revenue, 0) AS total_revenue
+FROM accounts a
+LEFT JOIN (
+    SELECT account_id, COUNT(*) AS total_web_events
+    FROM web_events
+    GROUP BY account_id
+) w ON a.id = w.account_id
+LEFT JOIN (
+    SELECT account_id, COUNT(*) AS total_orders, SUM(total_amt_usd) AS total_revenue
+    FROM orders
+    GROUP BY account_id
+) o ON a.id = o.account_id
+ORDER BY total_revenue DESC;
+
+
+
+/* 5. Region by total revenue generated */
+
+SELECT r.name region, SUM(o.total_amt_usd) AS total_revenue
+FROM orders o
+JOIN accounts a on a.id = o.account_id
+JOIN sales_reps s ON s.id = a.sales_rep_id
+JOIN region r ON r.id = s.region_id
+GROUP BY r.name;
