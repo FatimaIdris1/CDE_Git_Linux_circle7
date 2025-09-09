@@ -48,10 +48,3 @@ README.md      → Project documentation and insights
 
 * PostgreSQL for querying and analysis  
 * GitHub for version control and documentation  
-
-## Next Steps
-
-* Visualize key insights using BI tools (Power BI/Tableau)  
-* Explore predictive analysis for sales forecasting  
-* Investigate deeper relationships between customer engagement and sales  
-```
